@@ -1,0 +1,10 @@
+import { useEffect, useState } from 'react'
+import { Button, Card, PageHeader, StatusBadge } from '../../components/UI'
+import { approveUser, getPendingUsers, rejectUser } from '../../services/adminService'
+
+export default function ManageUsers() {
+  const [users, setUsers] = useState([]); const [error, setError] = useState('')
+  useEffect(() => { let mounted = true; getPendingUsers().then((result) => { if (mounted) setUsers(result) }).catch(() => { if (mounted) setError('Unable to load pending users.') }); return () => { mounted = false } }, [])
+  const decide = async (user, approved) => { if (!window.confirm(`${approved ? 'Approve' : 'Reject'} ${user.fullName}?`)) return; try { if (approved) await approveUser(user.id); else await rejectUser(user.id, window.prompt('Optional rejection reason') || 'Your account was not approved.'); setUsers((currentUsers) => currentUsers.filter((item) => item.id !== user.id)) } catch { setError('Unable to update this account.') } }
+  return <><PageHeader eyebrow="Admin / People" title="Pending approvals" description="Review employee accounts before they can access LeaveWeb." />{error && <div className="alert error">{error}</div>}<Card className="table-card"><div className="toolbar"><span className="toolbar-count">{users.length} pending account{users.length === 1 ? '' : 's'}</span></div><div className="table-wrap"><table><thead><tr><th>Employee ID</th><th>Full name</th><th>Email</th><th>Department</th><th>Phone</th><th>Registered</th><th>Status</th><th>Actions</th></tr></thead><tbody>{users.map((user) => <tr key={user.id}><td>{user.employeeId}</td><td>{user.fullName}</td><td>{user.email}</td><td>{user.department}</td><td>{user.phone || '-'}</td><td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '-'}</td><td><StatusBadge status={user.accountStatus || 'PENDING'} /></td><td><Button onClick={() => decide(user, true)}>Approve</Button> <button onClick={() => decide(user, false)}>Reject</button></td></tr>)}{users.length === 0 && <tr><td colSpan="8">No pending accounts.</td></tr>}</tbody></table></div></Card></>
+}

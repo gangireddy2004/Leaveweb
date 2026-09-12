@@ -1,0 +1,12 @@
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { useState } from 'react'
+import { useAuth } from '../context/AuthContext'
+import { useNotifications } from '../context/NotificationContext'
+
+const baseLinks = [['/dashboard', 'Overview'], ['/apply-leave', 'Apply leave'], ['/my-leaves', 'My leaves'], ['/calendar', 'Leave calendar'], ['/notifications', 'Notifications'], ['/profile', 'My profile']]
+const adminLinks = [['/admin', 'Admin dashboard'], ['/admin/users', 'Users'], ['/admin/leaves', 'Leave requests'], ['/admin/leave-types', 'Leave types'], ['/admin/reports', 'Reports']]
+export default function AppLayout() {
+  const { user, logout } = useAuth(); const { unreadCount } = useNotifications(); const [open, setOpen] = useState(false); const location = useLocation()
+  const nav = (item) => <NavLink key={item[0]} to={item[0]} end={item[0] === '/dashboard' || item[0] === '/admin'} onClick={() => setOpen(false)} className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}><span className="nav-mark">{item[1].slice(0, 1)}</span>{item[1]}{item[1] === 'Notifications' && unreadCount > 0 && <i className="count-dot">{unreadCount}</i>}</NavLink>
+  return <div className="app-shell"><aside className={open ? 'sidebar open' : 'sidebar'}><div className="brand"><span className="brand-mark">L</span><span>leave<span>web</span></span></div><div className="workspace-label">WORKSPACE</div><nav>{baseLinks.map(nav)}</nav>{user?.isAdmin && <><div className="workspace-label admin-label">ADMIN</div><nav>{adminLinks.map(nav)}</nav></>}<div className="sidebar-bottom"><div className="help-box"><strong>Need a hand?</strong><span>Visit the help center</span></div><button className="logout-link" onClick={logout}>↪ <span>Log out</span></button></div></aside><div className="main-area"><header className="topbar"><button className="menu-button" onClick={() => setOpen(!open)} aria-label="Open navigation">☰</button><div className="breadcrumb">{location.pathname.includes('admin') ? 'Admin / ' : 'Workspace / '}<strong>{location.pathname.split('/').filter(Boolean).pop()?.replace('-', ' ') || 'dashboard'}</strong></div><div className="top-actions"><NavLink to="/notifications" className="notification-button" aria-label="Notifications">♡{unreadCount > 0 && <i>{unreadCount}</i>}</NavLink><div className="top-user"><span className="avatar">{user?.avatar || 'MA'}</span><span><strong>{user?.name}</strong><small>{user?.role}</small></span></div></div></header><main className="content"><Outlet /></main></div></div>
+}
