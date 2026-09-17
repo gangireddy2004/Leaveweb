@@ -1,10 +1,10 @@
 # LeaveWeb backend
 
-Spring Boot 3.4 / Java 21 REST API for the LeaveWeb React client. The backend uses MongoDB for persistence, BCrypt for password hashing, and stateless JWT authentication. It does not connect to or modify the React project.
+Spring Boot 3.4 / Java 25 REST API for the LeaveWeb React client. The backend uses MongoDB for persistence, BCrypt for password hashing, and stateless JWT authentication. It does not connect to or modify the React project.
 
 ## Requirements
 
-- Java 21
+- Java 25
 - Maven 3.9+
 - MongoDB running locally at `mongodb://localhost:27017`
 

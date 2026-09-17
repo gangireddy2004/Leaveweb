@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: leaveweb
+  labels:
+    app: frontend
+    app.kubernetes.io/name: leaveweb-frontend
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: frontend
+
+  template:
+    metadata:
+      labels:
+        app: frontend
+        app.kubernetes.io/name: leaveweb-frontend
+
+    spec:
+      containers:
+        - name: frontend
+          image: leaveweb-frontend:local
+          imagePullPolicy: Never
+
+          ports:
+            - containerPort: 80
+              protocol: TCP
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"

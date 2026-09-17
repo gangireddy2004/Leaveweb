@@ -1,0 +1,18 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+
+  # ==========================================
+  # LeaveWeb Backend
+  # ==========================================
+  - job_name: "leaveweb-backend"
+
+    metrics_path: /actuator/prometheus
+
+    scrape_interval: 10s
+
+    static_configs:
+      - targets:
+          - "backend:8080"
