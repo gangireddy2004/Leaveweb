@@ -26,6 +26,24 @@ pipeline {
             }
         }
 
+        stage('Login to Docker Hub') {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-credentials',
+                        usernameVariable: 'DOCKERHUB_USERNAME',
+                        passwordVariable: 'DOCKERHUB_TOKEN'
+                    )
+                ]) {
+                    sh '''
+                        echo "$DOCKERHUB_TOKEN" | docker login \
+                          --username "$DOCKERHUB_USERNAME" \
+                          --password-stdin
+                    '''
+                }
+            }
+        }
+
         stage('Build Docker Images') {
             steps {
                 withCredentials([
@@ -45,24 +63,6 @@ pipeline {
                           -t "$DOCKERHUB_USERNAME/leaveweb-frontend:$BUILD_NUMBER" \
                           -t "$DOCKERHUB_USERNAME/leaveweb-frontend:latest" \
                           ./frontend
-                    '''
-                }
-            }
-        }
-
-        stage('Login to Docker Hub') {
-            steps {
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'dockerhub-credentials',
-                        usernameVariable: 'DOCKERHUB_USERNAME',
-                        passwordVariable: 'DOCKERHUB_TOKEN'
-                    )
-                ]) {
-                    sh '''
-                        echo "$DOCKERHUB_TOKEN" | docker login \
-                          --username "$DOCKERHUB_USERNAME" \
-                          --password-stdin
                     '''
                 }
             }
